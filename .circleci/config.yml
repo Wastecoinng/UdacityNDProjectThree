@@ -327,6 +327,7 @@ jobs:
           command: |
             cd backend
             ls
+            npx -p typescript tsc
             npm i
             npm audit fix --audit-level=critical 
             npm run build
