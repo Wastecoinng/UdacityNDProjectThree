@@ -80,7 +80,7 @@ jobs:
           working_directory: ./backend
           command: |
             npm i
-            npm audit fix --audit-level=critical 
+            # npm audit fix --audit-level=critical 
             npm run build
             # cp .env dist/.env
             pwd && ls -al
