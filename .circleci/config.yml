@@ -36,7 +36,7 @@ commands:
           name: Revert migrations
           when: on_fail
           command: |
-            SUCCESS=$(curl --insecure  https://kvdb.io/<< pipeline.parameters.memstash-token >>/migration_<< parameters.workflow_id >>)
+            SUCCESS=$(curl --insecure  https://kvdb.io/<< pipeline.parameters.kvdb-token >>/migration_<< parameters.workflow_id >>)
             if(( $SUCCESS==1 )); 
             then
               cd ~/project/backend
@@ -278,10 +278,10 @@ jobs:
             if grep -q "has been done successfully" ./migration_status.txt 
             then 
               echo "has been done successfully"
-              curl https://kvdb.io/<< pipeline.parameters.memstash-token >>/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+              curl https://kvdb.io/<< pipeline.parameters.kvdb-token >>/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
             else
               echo "has failed"
-              curl https://kvdb.io/<< pipeline.parameters.memstash-token >>/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '0'
+              curl https://kvdb.io/<< pipeline.parameters.kvdb-token >>/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '0'
             fi
       - revert-migrations
       - destroy-environment
@@ -428,7 +428,7 @@ jobs:
   #           echo "Old Workflow ID: ${OldWorkflowID}"
 
   #           curl -H "Content-Type: text/plain" \
-  #             -H "token: << pipeline.parameters.memstash-token >>" \
+  #             -H "token: << pipeline.parameters.kvdb-token >>" \
   #             --request PUT --data $OldWorkflowID \
   #             https://api.memstash.io/values/old_workflow_id_${CIRCLE_WORKFLOW_ID}
   #     - run:
@@ -451,7 +451,7 @@ jobs:
   #     - run:
   #         name: Remove old stacks and files
   #         command: |
-  #           export OldWorkflowID=$(curl -H "token: << pipeline.parameters.memstash-token >>" --request GET https://api.memstash.io/values/old_workflow_id_${CIRCLE_WORKFLOW_ID})
+  #           export OldWorkflowID=$(curl -H "token: << pipeline.parameters.kvdb-token >>" --request GET https://api.memstash.io/values/old_workflow_id_${CIRCLE_WORKFLOW_ID})
   #           echo "Old Workflow ID: ${OldWorkflowID}"
 
   #           if [ "${OldWorkflowID}" != "<< pipeline.parameters.workflow-id >>" ]
