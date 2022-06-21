@@ -7,6 +7,7 @@ orbs:
 parameters:
   workflow-id:
     type: string
+    default: "${CIRCLE_WORKFLOW_ID:0:7}"
   # kvdb-token:
   #   type: string
   #   default: "5YhF3BFvpZJQXc4AYAByDz"
