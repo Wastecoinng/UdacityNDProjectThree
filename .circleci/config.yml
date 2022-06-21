@@ -7,10 +7,9 @@ orbs:
 parameters:
   workflow-id:
     type: string
-    default: "${CIRCLE_WORKFLOW_ID:0:7}"
-  kvdb-token:
-    type: string
-    default: "5YhF3BFvpZJQXc4AYAByDz"
+  # kvdb-token:
+  #   type: string
+  #   default: "5YhF3BFvpZJQXc4AYAByDz"
 
 commands:
   destroy-environment:
@@ -20,11 +19,11 @@ commands:
           name: Destroy environments
           when: on_fail
           command: |
-            aws s3 rm --recursive s3://udapeople-<< pipeline.parameters.workflow-id >>
+            aws s3 rm --recursive s3://udapeople-<< parameters.workflow-id >>
             aws cloudformation delete-stack \
-              --stack-name "udapeople-backend-<< pipeline.parameters.workflow-id >>"
+              --stack-name "udapeople-backend-<< parameters.workflow-id >>"
             aws cloudformation delete-stack \
-              --stack-name "udapeople-frontend-<< pipeline.parameters.workflow-id >>"
+              --stack-name "udapeople-frontend-<< parameters.workflow-id >>"
 
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
@@ -36,7 +35,7 @@ commands:
           name: Revert migrations
           when: on_fail
           command: |
-            SUCCESS=$(curl --insecure  https://kvdb.io/<< pipeline.parameters.kvdb-token >>/migration_<< parameters.workflow-id >>)
+            SUCCESS=$(curl --insecure  https://kvdb.io/5YhF3BFvpZJQXc4AYAByDz/migration_<< parameters.workflow-id >>)
             if(( $SUCCESS==1 )); 
             then
               cd ~/project/backend
@@ -170,16 +169,16 @@ jobs:
           command: |
             aws cloudformation deploy \
               --template-file .circleci/files/backend.yml \
-              --stack-name "udapeople-backend-<< pipeline.parameters.workflow-id >>" \
-              --parameter-overrides ID="<< pipeline.parameters.workflow-id >>" \
+              --stack-name "udapeople-backend-<< parameters.workflow-id >>" \
+              --parameter-overrides ID="<< parameters.workflow-id >>" \
               --tags project=udapeople
       - run:
           name: Ensure front-end infrastructure exist
           command: |
             aws cloudformation deploy \
               --template-file .circleci/files/frontend.yml \
-              --stack-name "udapeople-frontend-<< pipeline.parameters.workflow-id >>" \
-              --parameter-overrides ID="<< pipeline.parameters.workflow-id >>" \
+              --stack-name "udapeople-frontend-<< parameters.workflow-id >>" \
+              --parameter-overrides ID="<< parameters.workflow-id >>" \
               --tags project=udapeople
       - run:
           name: Add back-end ip to ansible inventory
@@ -278,10 +277,10 @@ jobs:
             if grep -q "has been done successfully" ./migration_status.txt 
             then 
               echo "has been done successfully"
-              curl https://kvdb.io/<< pipeline.parameters.kvdb-token >>/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+              curl https://kvdb.io/5YhF3BFvpZJQXc4AYAByDz/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
             else
               echo "has failed"
-              curl https://kvdb.io/<< pipeline.parameters.kvdb-token >>/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '0'
+              curl https://kvdb.io/5YhF3BFvpZJQXc4AYAByDz/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '0'
             fi
       - revert-migrations:
           workflow-id: ${CIRCLE_WORKFLOW_ID:0:7} 
@@ -327,7 +326,7 @@ jobs:
       - run:
           name: Deploy frontend objects
           command: |
-            aws s3 cp --recursive frontend/dist "s3://udapeople-<< pipeline.parameters.workflow-id >>"
+            aws s3 cp --recursive frontend/dist "s3://udapeople-<< parameters.workflow-id >>"
       - revert-migrations:
           workflow-id: ${CIRCLE_WORKFLOW_ID:0:7} 
       - destroy-environment: 
@@ -397,7 +396,7 @@ jobs:
   #     - run:
   #         name: Frontend smoke test.
   #         command: |
-  #           URL="http://udapeople-<< pipeline.parameters.workflow-id >>.s3-website-eu-west-3.amazonaws.com"
+  #           URL="http://udapeople-<< parameters.workflow-id >>.s3-website-eu-west-3.amazonaws.com"
   #           echo $URL
 
   #           if curl -s ${URL} | grep "Welcome"
@@ -443,7 +442,7 @@ jobs:
   #           aws cloudformation deploy \
   #             --template-file .circleci/files/cloudfront.yml \
   #             --stack-name "udapeople-cloudfront" \
-  #             --parameter-overrides WorkflowID="<< pipeline.parameters.workflow-id >>" \
+  #             --parameter-overrides WorkflowID="<< parameters.workflow-id >>" \
   #             --tags project=udapeople
   #     - revert-migrations
   #     - destroy-environment
@@ -460,7 +459,7 @@ jobs:
   #           export OldWorkflowID=$(curl -H "token: << pipeline.parameters.kvdb-token >>" --request GET https://api.memstash.io/values/old_workflow_id_${CIRCLE_WORKFLOW_ID})
   #           echo "Old Workflow ID: ${OldWorkflowID}"
 
-  #           if [ "${OldWorkflowID}" != "<< pipeline.parameters.workflow-id >>" ]
+  #           if [ "${OldWorkflowID}" != "<< parameters.workflow-id >>" ]
   #           then
   #             aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
   #             aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
