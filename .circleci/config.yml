@@ -14,6 +14,10 @@ parameters:
 
 commands:
   destroy-environment:
+    parameters:
+      workflow-id:
+        type: string
+        default: "${CIRCLE_WORKFLOW_ID:0:7}"
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
     steps:
       - run:
@@ -27,6 +31,9 @@ commands:
               --stack-name "udapeople-frontend-<< parameters.workflow-id >>"
 
   revert-migrations:
+    workflow-id:
+      type: string
+      default: "${CIRCLE_WORKFLOW_ID:0:7}"
     description: Revert the last migration if successfully run in the current workflow.
     # parameters:
     steps:
@@ -160,6 +167,10 @@ jobs:
       #     template: success_tagged_deploy_1
 
   deploy-infrastructure:
+    parameters:
+      workflow-id:
+        type: string
+        default: "${CIRCLE_WORKFLOW_ID:0:7}"
     docker:
       - image: cimg/base:2020.01
     steps:
@@ -329,7 +340,7 @@ jobs:
       - run:
           name: Deploy frontend objects
           command: |
-            aws s3 cp --recursive frontend/dist "s3://udapeople-<< parameters.workflow-id >>"
+            aws s3 cp --recursive frontend/dist "s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} "
       - revert-migrations:
           workflow-id: ${CIRCLE_WORKFLOW_ID:0:7} 
       - destroy-environment: 
