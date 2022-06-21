@@ -4,10 +4,10 @@ orbs:
   slack: circleci/slack@4.1.1
   aws-cli: circleci/aws-cli@1.3.0
 
-parameters:
-  workflow-id:
-    type: string
-    default: "${CIRCLE_WORKFLOW_ID:0:7}"
+# parameters:
+#   workflow-id:
+#     type: string
+#     default: "${CIRCLE_WORKFLOW_ID:0:7}"
   # kvdb-token:
   #   type: string
   #   default: "5YhF3BFvpZJQXc4AYAByDz"
