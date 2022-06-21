@@ -326,17 +326,14 @@ jobs:
       - run:
           name: Deploy backend
           command: |
-            cd backend
-            ls
-            npx -p typescript tsc
-            npm i
-            npm audit fix --audit-level=critical 
-            npm run build
-            cd ..
+            # cd backend
             # ls
-            # npm install
-            # npm audit fix --audit-level=critical --force
+            # npx -p typescript tsc
+            # npm i
+            # npm audit fix --audit-level=critical 
             # npm run build
+            # cd ..
+            ls
             tar -C backend -czvf artifact.tar.gz .
             cat ~/project/.circleci/ansible/inventory.txt
             ansible-playbook -i ~/project/.circleci/ansible/inventory.txt ~/project/.circleci/ansible/deploy-backend.yml
