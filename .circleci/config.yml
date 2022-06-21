@@ -284,7 +284,9 @@ jobs:
               curl https://kvdb.io/<< pipeline.parameters.kvdb-token >>/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '0'
             fi
       - revert-migrations
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7} 
       - destroy-environment
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7} 
 
   deploy-frontend:
     docker:
@@ -327,7 +329,9 @@ jobs:
           command: |
             aws s3 cp --recursive frontend/dist "s3://udapeople-<< pipeline.parameters.workflow-id >>"
       - revert-migrations
-      - destroy-environment    
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7} 
+      - destroy-environment 
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}    
                     
   deploy-backend:
     docker:
@@ -362,7 +366,9 @@ jobs:
           command: |
             apk add --update py3-pip && pip3 install --upgrade pip && pip3 install awscli
       - revert-migrations
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7} 
       - destroy-environment
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7} 
 
   # smoke-test:
   #   docker:
