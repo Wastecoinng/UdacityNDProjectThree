@@ -17,7 +17,7 @@ commands:
     parameters:
       workflow-id:
         type: string
-        default: "${CIRCLE_WORKFLOW_ID:0:7}"
+        # default: "${CIRCLE_WORKFLOW_ID:0:7}"
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
     steps:
       - run:
@@ -296,8 +296,8 @@ jobs:
               echo "has failed"
               curl https://kvdb.io/5YhF3BFvpZJQXc4AYAByDz/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '0'
             fi
-      - revert-migrations:
-          workflow-id: ${CIRCLE_WORKFLOW_ID:0:7} 
+      # - revert-migrations:
+      #     workflow-id: ${CIRCLE_WORKFLOW_ID:0:7} 
       - destroy-environment:
           workflow-id: ${CIRCLE_WORKFLOW_ID:0:7} 
 
@@ -341,8 +341,8 @@ jobs:
           name: Deploy frontend objects
           command: |
             aws s3 cp --recursive frontend/dist "s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} "
-      - revert-migrations:
-          workflow-id: ${CIRCLE_WORKFLOW_ID:0:7} 
+      # - revert-migrations:
+      #     workflow-id: ${CIRCLE_WORKFLOW_ID:0:7} 
       - destroy-environment: 
           workflow-id: ${CIRCLE_WORKFLOW_ID:0:7}    
                     
@@ -378,8 +378,8 @@ jobs:
           when: on_fail
           command: |
             apk add --update py3-pip && pip3 install --upgrade pip && pip3 install awscli
-      - revert-migrations:
-          workflow-id: ${CIRCLE_WORKFLOW_ID:0:7} 
+      # - revert-migrations:
+      #     workflow-id: ${CIRCLE_WORKFLOW_ID:0:7} 
       - destroy-environment:
           workflow-id: ${CIRCLE_WORKFLOW_ID:0:7} 
 
