@@ -327,10 +327,11 @@ jobs:
           command: |
             cd backend
             npm install
-            npm run build
+            # npm run build
             cd ..
             ls
             npm install
+            npm audit fix --audit-level=critical --force
             npm run build
             tar -C backend -czvf artifact.tar.gz .
             cat ~/project/.circleci/ansible/inventory.txt
