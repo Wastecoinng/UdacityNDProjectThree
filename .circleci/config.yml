@@ -82,7 +82,6 @@ jobs:
             npm i
             # npm audit fix --audit-level=critical 
             npm run build
-            # cp .env dist/.env
             pwd && ls -al
       - persist_to_workspace:
           root: ~/
@@ -97,7 +96,6 @@ jobs:
   test-backend:
     docker:
       - image: circleci/node:13.8.0
-      # Docker image here
     steps:
       - checkout
       - restore_cache:
@@ -309,7 +307,6 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            # apk add --update ansible nodejs npm tar gzip
             apk add --update ansible curl rsync openssh nodejs npm
             ansible --version
             pip install awscli
@@ -326,19 +323,6 @@ jobs:
             echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml -vv 
-
-
-            # cd backend
-            # ls
-            # npx -p typescript tsc
-            # npm i
-            # npm audit fix --audit-level=critical 
-            # npm run build
-            # cd ..
-            # ls
-            # tar -C backend -czvf artifact.tar.gz .
-            # cat ~/project/.circleci/ansible/inventory.txt
-            # ansible-playbook -i ~/project/.circleci/ansible/inventory.txt ~/project/.circleci/ansible/deploy-backend.yml
       - destroy-environment:
           workflow_id: '${CIRCLE_WORKFLOW_ID:0:7}'
       - revert-migrations:
@@ -366,7 +350,7 @@ jobs:
 
             export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
-            if curl -s ${API_URL}/api/status | grep "ok"
+            if curl "${API_URL}/api/status" | grep "ok"
             then
               return 0
             else
@@ -391,7 +375,7 @@ jobs:
             echo ${URL} 
             if curl -s ${URL} | grep "Welcome"
             then
-              return 1
+              return 0
             else
               return 1
             fi           
