@@ -471,7 +471,6 @@ jobs:
             then
             echo "No workflow id found"
             else
-            if [[ "683c244" != "6f4e40c" ]] 
             if [[ "${CIRCLE_WORKFLOW_ID:0:7}" != "${OldWorkflowID}" ]]
             then
               echo "$OldWorkflowID!=${CIRCLE_WORKFLOW_ID:0:7} => will delete old version"
