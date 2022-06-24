@@ -292,130 +292,42 @@ jobs:
       - revert-migrations:
           workflow_id: '${CIRCLE_WORKFLOW_ID:0:7}'
 
-  # deploy-backend:
-  #   docker:
-  #     - image: python:3.7-alpine3.11    
-  #   steps:
-  #     - checkout
-  #     - add_ssh_keys:
-  #         fingerprints: ["47:3c:9d:00:3a:9f:bd:bd:49:00:6c:e4:8d:2c:c9:0a"]
-  #     - attach_workspace: 
-  #         at: .
-  #     - run: 
-  #         name: View content of inventory.txt
-  #         command: cat .circleci/ansible/inventory.txt 
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           apk add --update ansible curl rsync openssh nodejs npm
-  #           ansible --version
-  #           pip install awscli
-  #           aws --version
-  #     - run:
-  #         name: Deploy backend
-  #         command: |
-  #           cd backend
-  #           npm i
-  #           npm run build
-  #           cd ..
-  #           tar -C backend -czvf artifact.tar.gz .
-  #           cd .circleci/ansible
-  #           echo "Contents  of the inventory.txt file is -------"
-  #           cat inventory.txt
-  #           ansible-playbook -i inventory.txt deploy-backend.yml -vv 
-   # new guy code starts here
   deploy-backend:
     docker:
-      - image: python:3.7-alpine3.11
+      - image: python:3.7-alpine3.11    
     steps:
       - checkout
-      - restore_cache:
-          keys: [backend-build]
       - add_ssh_keys:
           fingerprints: ["47:3c:9d:00:3a:9f:bd:bd:49:00:6c:e4:8d:2c:c9:0a"]
-      - attach_workspace:
-          at: ~/
+      - attach_workspace: 
+          at: .
       - run: 
+          name: View content of inventory.txt
+          command: cat .circleci/ansible/inventory.txt 
+      - run:
           name: Install dependencies
           command: |
-            apk add --update curl nodejs npm
-            apk add --update ansible zip
-            apk add --update openssh-client tar gzip
+            apk add --update ansible curl rsync openssh nodejs npm
+            ansible --version
             pip install awscli
+            aws --version
       - run:
-          name: Build backend app
+          name: Deploy backend
           command: |
-            cd ~/project/backend
-            ls
-            cd ../
-            cd backend/ && tar -zcvf ../backend.tar.gz . && cd - 
-            mkdir -p ~/project/.circleci/ansible/roles/deploy/files/
-            mv backend.tar.gz ~/project/.circleci/ansible/roles/deploy/files/
-      - run:
-          name: Deploy backend Setup EC2 instance & copy compiled backend to the EC2 instance
-          command: |
-            # ls ~/project/.circleci/ansible/roles/deploy/files/
-            cd ~/project/backend
-            ansible-galaxy install weareinteractive.environment
-            cat ~/project/.circleci/ansible/inventory.txt
-            ansible-playbook -i ~/project/.circleci/ansible/inventory.txt ~/project/.circleci/ansible/deploy-backend.yml
-    # new guy code ends here
+            cd backend
+            npm i
+            npm run build
+            cd ..
+            tar -C backend -czvf artifact.tar.gz .
+            cd .circleci/ansible
+            echo "Contents  of the inventory.txt file is -------"
+            cat inventory.txt
+            ansible-playbook -i inventory.txt deploy-backend.yml -vv 
       - destroy-environment:
           workflow_id: '${CIRCLE_WORKFLOW_ID:0:7}'
       - revert-migrations:
           workflow_id: '${CIRCLE_WORKFLOW_ID:0:7}'
 
-  # smoke-test-backend:
-  #   docker:
-  #     - image: python:3.7-alpine3.11
-  #   steps:
-  #     - checkout
-  #     - attach_workspace:
-  #         at: ~/
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           apk add --update curl
-  #           pip install awscli
-  #     - run:
-  #         name: Backend smoke test
-  #         command: |
-  #           BACKEND_IP=$(aws ec2 describe-instances \
-  #             --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-  #             --query 'Reservations[*].Instances[*].PublicIpAddress' \
-  #             --output text)
-
-  #           export API_URL="http://${BACKEND_IP}:3030"
-  #           echo "${API_URL}"
-  #           if curl "${API_URL}/api/status" | grep "ok"
-  #           then
-  #             return 0
-  #           else
-  #             return 1
-  #           fi
-  # smoke-test-frontend:
-  #   docker:
-  #     - image: python:3.7-alpine3.11
-  #   steps:
-  #     - checkout
-  #     - attach_workspace:
-  #         at: ~/
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           apk add --update curl
-  #           pip install awscli
-  #     - run:
-  #         name: Smoke test for front end
-  #         command: |
-  #           URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-west-2.amazonaws.com"             
-  #           echo ${URL} 
-  #           if curl -s ${URL} | grep "Welcome"
-  #           then
-  #             return 0
-  #           else
-  #             return 1
-  #           fi   
   smoke-test:
     docker:
       - image: python:3.7-alpine3.11
@@ -433,7 +345,7 @@ jobs:
           command: |
             FRONTEND_WEBSITE=http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-${AWS_DEFAULT_REGION}.amazonaws.com
             echo $FRONTEND_WEBSITE
-            if curl -s $FRONTEND_WEBSITE | grep "Welcome"
+            if curl -s ${FRONTEND_WEBSITE} | grep "Welcome"
             then
               exit 0
             else
@@ -449,7 +361,7 @@ jobs:
             export API_URL=http://${BACKEND_PUBLIC_IP}:3030
             echo $API_URL
             # curl -s $API_URL/api/status
-            if curl -s $API_URL/api/status | grep "ok"
+            if curl "${API_URL}/api/status" | grep "ok"
             then
               exit 0
             else
@@ -541,11 +453,6 @@ workflows:
           requires: [run-migrations]
       - smoke-test:
           requires: [deploy-backend, deploy-frontend]
-      # - smoke-test-backend:
-      #     requires: [deploy-backend]
-      # - smoke-test-frontend:
-      #     requires: [deploy-frontend]
-      
       - cloudfront-update:
           requires: [smoke-test]
       - cleanup:
