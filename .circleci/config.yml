@@ -27,7 +27,7 @@ commands:
           name: Revert migrations
           when: on_fail
           command: |
-            SUCCESS=$(curl --insecure https://kvdb.io/Y2KNsbnjNygvrpLpYzaqxu/migration_<< parameters.workflow_id >>)
+            SUCCESS=$(curl --insecure https://kvdb.io/5YhF3BFvpZJQXc4AYAByDz/migration_<< parameters.workflow_id >>)
             echo $SUCCESS
             if(( $SUCCESS == 1 )); 
             then
@@ -161,7 +161,7 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys: 
-          fingerprints: ["87:ad:56:da:6a:94:b9:cb:39:58:25:dc:20:ab:d8:43"]
+          fingerprints: ["47:3c:9d:00:3a:9f:bd:bd:49:00:6c:e4:8d:2c:c9:0a"]
       - attach_workspace:
           at: .
       - run: 
@@ -209,7 +209,7 @@ jobs:
             if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
             then
               sudo apt-get update && sudo apt-get install -y ca-certificates
-              curl https://kvdb.io/Y2KNsbnjNygvrpLpYzaqxu/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+              curl https://kvdb.io/5YhF3BFvpZJQXc4AYAByDz/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
 
             fi 
       - destroy-environment:
@@ -261,7 +261,7 @@ jobs:
     steps:
       - checkout 
       - add_ssh_keys: 
-          fingerprints: ["87:ad:56:da:6a:94:b9:cb:39:58:25:dc:20:ab:d8:43"]
+          fingerprints: ["47:3c:9d:00:3a:9f:bd:bd:49:00:6c:e4:8d:2c:c9:0a"]
       - attach_workspace:
           at: .
       - run: 
@@ -407,7 +407,7 @@ workflows:
           requires: [test-frontend, test-backend, scan-frontend, scan-backend]
           filters:
             branches:
-              only: [master]
+              only: [femi]
       - configure-infrastructure:
           requires: [deploy-infrastructure]
       - run-migrations:
