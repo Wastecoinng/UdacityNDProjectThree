@@ -1,5 +1,5 @@
 ---
-  - name: "Move backend files to web server"
+- name: "Move backend files to web server"
   become: true
   copy:
     src: /root/project/backend.tar.gz
