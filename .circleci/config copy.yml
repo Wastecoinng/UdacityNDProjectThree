@@ -511,3 +511,21 @@ workflows:
       #     requires: [smoke-test]
       # - cleanup:
       #     requires: [cloudfront-update]
+
+
+global:
+  resolve_timeout: 1m
+  slack_api_url: 'https://hooks.slack.com/services/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'
+
+route:
+  receiver: 'slack-notifications'
+
+receivers:
+  - name: 'slack-notifications'
+    slack_configs:
+    - channel: '#general'
+      send_resolved: true
+
+
+line 8: field receiver already set in type config.plain\n  
+line 23: field auth_password not found in type config.plain"

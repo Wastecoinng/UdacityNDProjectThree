@@ -9,6 +9,8 @@ log.txt
 .vscode/
 npm-debug.log*
 presentation.pptx
+.circleci/config copy.yml
+presentation.pptx
 .idea/
 .ionic/
 .sourcemaps/
