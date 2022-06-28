@@ -209,7 +209,7 @@ jobs:
             # cat .env
             npm i
             # npm run build
-            # npm audit fix --audit-level=critical
+            npm audit fix --audit-level=critical
             # Run and save the migration output
             npm run migrations
       - run:
