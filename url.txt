@@ -1,8 +1,8 @@
 Public Url to GitHub repository (not private) [URL01]
-    https://github.com/todak2000/UdacityNDProjectThree
+    https://github.com/Wastecoinng/UdacityNDProjectThree/tree/submit
 
 Public Url to Circle
-    https://app.circleci.com/pipelines/github/Wastecoinng/UdacityNDProjectThree/75/workflows/4ff98fa5-3b79-42a6-a091-32016f711bab
+    https://app.circleci.com/pipelines/github/Wastecoinng/UdacityNDProjectThree?filter=all
 
 Public URL for your S3 Bucket (aka, your green candidate front-end) [URL02]
     http://udapeople-4ff98fa.s3-website-us-east-1.amazonaws.com
