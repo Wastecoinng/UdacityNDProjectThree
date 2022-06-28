@@ -8,7 +8,10 @@ log.txt
 *.sublime-workspace
 .vscode/
 npm-debug.log*
-
+presentation.pptx
+.circleci/config copy.yml
+presentation.pptx
+.circleci copy
 .idea/
 .ionic/
 .sourcemaps/
