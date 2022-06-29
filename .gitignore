@@ -57,6 +57,7 @@ coverage/
 www/
 node_modules/
 tmp/
+.circleci/config-sample.yml
 temp/
 platforms/
 plugins/
