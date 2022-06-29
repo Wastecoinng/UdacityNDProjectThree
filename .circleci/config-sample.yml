@@ -301,7 +301,7 @@ Endpoint (Hostname): rds-postgresql-project3.cxifxtghet1j.us-east-1.rds.amazonaw
 Instance identifier: rds-postgresql-project3 //This is not the database name
 Database name: postgres (default)
 Username: postgres
-Password: mypassword
+Password: postgress
 Port: 5432
 
 - job_name: 'node'
