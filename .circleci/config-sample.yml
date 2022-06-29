@@ -295,3 +295,44 @@ workflows:
           requires: [smoke-test]
       - cleanup:
           requires: [cloudfront-update]
+
+
+Endpoint (Hostname): rds-postgresql-project3.cxifxtghet1j.us-east-1.rds.amazonaws.com 
+Instance identifier: rds-postgresql-project3 //This is not the database name
+Database name: postgres (default)
+Username: postgres
+Password: mypassword
+Port: 5432
+
+- job_name: 'node'
+    ec2_sd_configs:
+      - region: us-east-1
+        access_key: AKIAWDPSRKSZ456FY5OR
+        secret_key: 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
+        port: 9100
+
+- job_name: "udapeople"
+    static_configs:
+      - targets: ["ec2-54-224-255-144.compute-1.amazonaws.com:9100"]
+- job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+
+[Unit]
+Description=Alert Manager
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=prometheus
+Group=prometheus
+ExecStart=/usr/local/bin/alertmanager \
+  --config.file= ~/alertmanager/alertmanager-0.23.0.linux-amd64/alertmanager.yml \
+  --storage.path=/var/lib/alertmanager
+
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
