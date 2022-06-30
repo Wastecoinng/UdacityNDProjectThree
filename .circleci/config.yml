@@ -268,7 +268,7 @@ jobs:
   deploy-backend:
     docker:
       # - image: python:3.7-alpine3.11
-      - image: cimg/base
+      - image: cimg/base:2022.06
         environment:
           NODE_ENV: "production"
           VERSION: "1"
