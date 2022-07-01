@@ -169,9 +169,6 @@ jobs:
           fingerprints: ["47:3c:9d:00:3a:9f:bd:bd:49:00:6c:e4:8d:2c:c9:0a"]
       - attach_workspace:
           at: ~/
-      # - run: 
-      #     name: View content of inventory.txt
-      #     command: cat .circleci/ansible/inventory.txt 
       - run:
           name: Install dependencies
           command: |
@@ -191,18 +188,8 @@ jobs:
   run-migrations:
     docker:
       - image: circleci/node:13.8.0
-      # - image: sleavely/node-awscli:14.x
     steps:
       - checkout
-      # - attach_workspace:
-      #     at: ~/.circleci/ansible/inventory.txt
-      # - run:
-      #     name: Install AWS CLI dependencies
-      #     command: |
-      #       sudo apt-get update && sudo apt-get install -yy less
-      #       curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-      #       unzip awscliv2.zip
-      #       sudo ./aws/install
       - run:
           name: Run migrations
           command: |
@@ -231,8 +218,6 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
-      # - attach_workspace:
-      #     at: ~/.circleci/ansible/inventory.txt
       - run:
           name: Install AWS CLI dependencies
           command: |
@@ -278,12 +263,6 @@ jobs:
           fingerprints: ["47:3c:9d:00:3a:9f:bd:bd:49:00:6c:e4:8d:2c:c9:0a"]
       - attach_workspace:
           at: ~/
-      # - restore_cache:
-      #     keys:
-      #       - build-backend
-      # - run: 
-      #     name: View content of inventory.txt
-      #     command: cat .circleci/ansible/inventory.txt 
       - run:
           name: Install dependencies
           command: |
@@ -324,8 +303,6 @@ jobs:
       - image: python:3.7-alpine3.11 
     steps:
       - checkout
-      # - attach_workspace:
-      #     at: ~/.circleci/ansible/inventory.txt
       - run:
           name: Install dependencies
           command: |
@@ -413,55 +390,6 @@ jobs:
             else
               echo "-------------------------Cannot Cleanup-------------------------"
             fi
-  # cloudfront-update:
-  #   docker:
-  #     - image: amazon/aws-cli
-  #   steps:
-  #     - checkout
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           yum -y install tar gzip awscli curl npm nodejs
-  #     - run:
-  #         name: Update cloudfront distribution
-  #         command: |
-  #           aws cloudformation deploy \
-  #             --template-file .circleci/files/cloudfront.yml \
-  #             --stack-name InitialStack \
-  #             --parameter-overrides WorkflowID2="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" \
-  #             --tags project=udapeople
-  #     - revert-migrations:
-  #         workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}  
-
-  # cleanup:
-  #     docker:
-  #       - image: amazon/aws-cli
-  #     steps:
-  #       - checkout
-  #       - run:
-  #           name: Get old stack workflow id
-  #           command: |
-  #             export OldWorkflowID=$(aws cloudformation \
-  #               list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
-  #               --no-paginate --output text)
-  #             echo OldWorkflowID: "${OldWorkflowID}"
-  #             echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
-  #             export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
-  #               --stack-status-filter CREATE_COMPLETE --no-paginate --output text)) 
-  #             echo Stack names: "${STACKS[@]}"
-  #       - run:
-  #           name: Remove old stacks and files
-  #           command: |
-  #             if [[ "$CurrentWorkflowID" != "$OldWorkflowID" ]]
-  #             then
-  #               aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
-  #               aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
-  #               aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
-  #             else
-  #               echo "$OldWorkflowID==$CurrentWorkflowID => nothing needs to be done..."
-  #             fi
-            
-
 workflows:
   default:
     jobs:
