@@ -154,9 +154,9 @@ jobs:
               --output text >> .circleci/ansible/inventory.txt
 
       - persist_to_workspace:
-          root: .
+          root: ~/
           paths:
-            - .circleci/ansible/*
+            - project/.circleci/ansible/inventory.txt
       - destroy-environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}     
 
@@ -168,21 +168,22 @@ jobs:
       - add_ssh_keys: 
           fingerprints: ["47:3c:9d:00:3a:9f:bd:bd:49:00:6c:e4:8d:2c:c9:0a"]
       - attach_workspace:
-          at: .
-      - run: 
-          name: View content of inventory.txt
-          command: cat .circleci/ansible/inventory.txt 
+          at: ~/
+      # - run: 
+      #     name: View content of inventory.txt
+      #     command: cat .circleci/ansible/inventory.txt 
       - run:
           name: Install dependencies
           command: |
             # Install dependencies needed for your playbook
             apk add --update ansible
+            apk add --update --no-cache python3 py3-pip
+            /usr/local/bin/python -m pip install --upgrade pip
             pip install awscli
-            aws --version
       - run:
           name: Configure server
           command: |
-            cd .circleci/ansible
+            cd ~/project/.circleci/ansible
             ansible-playbook -i inventory.txt configure-server.yml 
       - destroy-environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}    
@@ -193,15 +194,15 @@ jobs:
       # - image: sleavely/node-awscli:14.x
     steps:
       - checkout
-      - attach_workspace:
-          at: ~/.circleci/ansible/inventory.txt
-      - run:
-          name: Install AWS CLI dependencies
-          command: |
-            sudo apt-get update && sudo apt-get install -yy less
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            sudo ./aws/install
+      # - attach_workspace:
+      #     at: ~/.circleci/ansible/inventory.txt
+      # - run:
+      #     name: Install AWS CLI dependencies
+      #     command: |
+      #       sudo apt-get update && sudo apt-get install -yy less
+      #       curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+      #       unzip awscliv2.zip
+      #       sudo ./aws/install
       - run:
           name: Run migrations
           command: |
@@ -230,15 +231,18 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
-      - attach_workspace:
-          at: ~/.circleci/ansible/inventory.txt
+      # - attach_workspace:
+      #     at: ~/.circleci/ansible/inventory.txt
       - run:
           name: Install AWS CLI dependencies
           command: |
-            sudo apt-get update && sudo apt-get install -yy less
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            sudo ./aws/install
+            sudo apt update && sudo apt upgrade
+            sudo apt-get install python python-pip 
+            sudo pip install awscli 
+            python -m pip install --user ansible
+            npm install
+            sudo apt-get install curl
+            sudo apt-get install tar gzip
       - run:
           name: Get backend url
           command: |
@@ -274,32 +278,43 @@ jobs:
       - add_ssh_keys: 
           fingerprints: ["47:3c:9d:00:3a:9f:bd:bd:49:00:6c:e4:8d:2c:c9:0a"]
       - attach_workspace:
-          at: .
+          at: ~/
       # - restore_cache:
       #     keys:
       #       - build-backend
-      - run: 
-          name: View content of inventory.txt
-          command: cat .circleci/ansible/inventory.txt 
+      # - run: 
+      #     name: View content of inventory.txt
+      #     command: cat .circleci/ansible/inventory.txt 
       - run:
           name: Install dependencies
           command: |
-            apk add --update ansible curl rsync openssh nodejs npm
-            ansible --version
-            pip install awscli
-            aws --version
+            apk add --update ansible
+            apk add --update tar gzip nodejs npm
+            apk add --update --no-cache python3 py3-pip
+            /usr/local/bin/python -m pip install --upgrade pip
+            pip install awscli 
       - run:
           name: Deploy backend
           command: |
             cd backend
+            echo TYPEORM_CONNECTION=postgres >> ".env"
+            echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> ".env"
+            echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> ".env"
+            echo TYPEORM_MIGRATIONS=./src/migrations/*.ts >> ".env"
+            echo TYPEORM_HOST=$TYPEORM_HOST >> ".env"
+            echo TYPEORM_PORT=$TYPEORM_PORT >> ".env"
+            echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> ".env"
+            echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> ".env"
+            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> ".env"
             npm i
             npm run build
             cd ..
+            pwd
             tar -C backend -czvf artifact.tar.gz .
             cd .circleci/ansible
             echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt
-            ansible-playbook -i inventory.txt deploy-backend.yml -vv  
+            ansible-playbook -i inventory.txt deploy-backend.yml 
       - destroy-environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
       - revert-migrations:
@@ -310,13 +325,16 @@ jobs:
       - image: python:3.7-alpine3.11 
     steps:
       - checkout
-      - attach_workspace:
-          at: ~/.circleci/ansible/inventory.txt
+      # - attach_workspace:
+      #     at: ~/.circleci/ansible/inventory.txt
       - run:
           name: Install dependencies
           command: |
-            apk add --update curl nodejs npm
-            pip install awscli 
+            apk add --update nodejs npm curl
+            apk add --update --no-cache python3 py3-pip
+            /usr/local/bin/python -m pip install --upgrade pip
+            pip install awscli
+            aws --version
       - run:
           name: Backend smoke test.
           command: |
@@ -359,9 +377,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            yum install -y tar gzip curl
-            curl -sL https://rpm.nodesource.com/setup_10.x | bash -
-            yum install -y nodejs
+            yum -y install tar gzip awscli curl npm nodejs
       - run:
           name: Update cloudfront distribution
           command: |
